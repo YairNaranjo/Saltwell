@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Saltwell · Contador de Silvinita</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep:#07211d;
+    --bg-panel:#0d2f29;
+    --teal-dark:#0f5849;
+    --teal:#1f8f72;
+    --green:#4ecb9b;
+    --paper:#f4f7f5;
+    --line: rgba(232,236,233,0.10);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    min-height:100vh;
+    background:
+      radial-gradient(circle at 15% -10%, rgba(78,203,155,0.16), transparent 45%),
+      radial-gradient(circle at 100% 0%, rgba(31,143,114,0.14), transparent 50%),
+      var(--bg-deep);
+    color:var(--paper);
+    font-family:'Inter', sans-serif;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:28px 16px;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .card{
+    width:100%;
+    max-width:460px;
+    background:var(--bg-panel);
+    border:1px solid var(--line);
+    border-radius:22px;
+    padding:30px 24px 24px;
+    box-shadow: 0 30px 60px -25px rgba(0,0,0,0.6);
+    position:relative;
+    overflow:hidden;
+  }
+
+  .card::before{
+    content:"";
+    position:absolute;
+    top:-60px; right:-60px;
+    width:180px; height:180px;
+    background:radial-gradient(circle, rgba(78,203,155,0.25), transparent 70%);
+    pointer-events:none;
+  }
+
+  header{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:12px;
+    margin-bottom:20px;
+    background:linear-gradient(180deg, #ffffff, #f2f5f3);
+    border-radius:18px;
+    padding:22px 20px 18px;
+    box-shadow: 0 10px 26px -12px rgba(0,0,0,0.35);
+  }
+
+  .logo{
+    max-width:200px;
+    width:65%;
+    height:auto;
+  }
+
+  .dots{
+    display:flex;
+    gap:3px;
+  }
+  .dots span{
+    width:4px;height:4px;border-radius:50%;
+    background:var(--teal);
+    display:inline-block;
+  }
+
+  .headline-zone{
+    text-align:center;
+    padding:26px 14px 22px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0));
+    border:1px solid var(--line);
+    border-radius:16px;
+    margin-bottom:18px;
+  }
+
+  .headline{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:clamp(24px, 7vw, 32px);
+    line-height:1.25;
+    letter-spacing:-0.01em;
+    text-transform:uppercase;
+    color:var(--paper);
+    margin:0;
+  }
+
+  .headline .num{
+    font-family:'IBM Plex Mono', monospace;
+    font-weight:700;
+    color:var(--green);
+    padding:0 2px;
+    display:inline-block;
+    transition: transform 0.18s ease;
+  }
+  .headline .num.pulse{
+    transform: scale(1.18);
+  }
+
+  .kg-sub{
+    margin-top:14px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:15px;
+    color:rgba(244,247,245,0.55);
+  }
+  .kg-sub b{
+    color:var(--green);
+    font-weight:600;
+  }
+
+  .status{
+    margin-top:8px;
+    font-size:11px;
+    letter-spacing:0.04em;
+    color:rgba(244,247,245,0.35);
+    min-height:14px;
+  }
+  .status.error{ color:#e08a6b; }
+
+  .actions{
+    display:flex;
+    gap:10px;
+    margin-bottom:14px;
+  }
+
+  button{
+    font-family:'Space Grotesk', sans-serif;
+    cursor:pointer;
+    border:none;
+    outline-offset:2px;
+  }
+
+  .btn-plus{
+    flex:1;
+    background:linear-gradient(135deg, var(--teal), var(--green));
+    color:#04211a;
+    font-weight:700;
+    font-size:19px;
+    padding:17px 0;
+    border-radius:14px;
+    letter-spacing:0.01em;
+    transition: transform 0.08s ease, filter 0.15s ease;
+  }
+  .btn-plus:active{ transform: scale(0.97); }
+  .btn-plus:hover{ filter:brightness(1.08); }
+
+  .btn-minus{
+    background:transparent;
+    color:rgba(244,247,245,0.5);
+    border:1px solid var(--line);
+    font-size:13px;
+    font-weight:500;
+    padding:0 16px;
+    border-radius:14px;
+  }
+  .btn-minus:hover{ color:var(--paper); border-color:rgba(244,247,245,0.3); }
+
+  .footer-row{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    margin-top:6px;
+  }
+
+  .tagline{
+    font-size:11px;
+    color:rgba(244,247,245,0.35);
+    letter-spacing:0.05em;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .headline .num{ transition:none; }
+    .btn-plus{ transition:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <header>
+    <img src="logo.png" alt="Saltwell" class="logo">
+    <div class="dots"><span></span><span></span><span></span></div>
+  </header>
+
+  <div class="headline-zone">
+    <p class="headline">BORIS, TE SAQUÉ <span class="num" id="counterValue">···</span> SILVINITAS</p>
+    <div class="kg-sub">Total en kg: <b id="kgValue">···</b></div>
+    <div class="status" id="statusMsg">Cargando…</div>
+  </div>
+
+  <div class="actions">
+    <button class="btn-plus" id="plusBtn">+1 bigbag</button>
+    <button class="btn-minus" id="minusBtn" title="Corregir">−1</button>
+  </div>
+
+  <div class="footer-row">
+    <span class="tagline">Less sodium · All natural</span>
+  </div>
+</div>
+
+<script>
+  const KG_PER_BIGBAG = 1250;
+
+  // --- Conexión a tu bin de JSONBin ---
+  const BIN_ID = '6a73ba98da38895dfebee89e';
+  const MASTER_KEY = '$2a$10$kU5zIGRSUPkjjib.1EThXegNrSw4B26XQFgMrvjdhXm/t8Yjb8FWK';
+  const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+
+  const counterEl = document.getElementById('counterValue');
+  const kgEl = document.getElementById('kgValue');
+  const statusEl = document.getElementById('statusMsg');
+  const plusBtn = document.getElementById('plusBtn');
+  const minusBtn = document.getElementById('minusBtn');
+
+  let count = 0;
+  let busy = false;
+  let todayKey = '';
+  let todayLabel = '';
+
+  function computeToday(){
+    // Usamos la zona horaria de Chile para que el día cambie igual para todos
+    todayKey = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'America/Santiago', year: 'numeric', month: '2-digit', day: '2-digit'
+    }).format(new Date()); // ej: 2026-08-05
+
+    const label = new Intl.DateTimeFormat('es-CL', {
+      timeZone: 'America/Santiago', weekday: 'long', day: '2-digit', month: 'long'
+    }).format(new Date());
+    todayLabel = label.charAt(0).toUpperCase() + label.slice(1);
+  }
+
+  function formatKg(n){
+    return n.toLocaleString('es-CL');
+  }
+
+  function render(pulse){
+    const kg = count * KG_PER_BIGBAG;
+    counterEl.textContent = count;
+    kgEl.textContent = `${formatKg(kg)} kg`;
+
+    if (pulse){
+      counterEl.classList.add('pulse');
+      setTimeout(() => counterEl.classList.remove('pulse'), 180);
+    }
+  }
+
+  function setStatus(msg, isError){
+    statusEl.textContent = msg;
+    statusEl.classList.toggle('error', !!isError);
+  }
+
+  function setBusy(state){
+    busy = state;
+    plusBtn.disabled = state;
+    minusBtn.disabled = state;
+    plusBtn.style.opacity = state ? 0.6 : 1;
+    minusBtn.style.opacity = state ? 0.6 : 1;
+  }
+
+  async function loadCount(){
+    computeToday();
+    setBusy(true);
+    setStatus('Cargando…');
+    try{
+      const res = await fetch(`${API_URL}/latest`, {
+        headers: { 'X-Master-Key': MASTER_KEY }
+      });
+      if (!res.ok) throw new Error('No se pudo cargar');
+      const data = await res.json();
+      const storedDate = data.record.date;
+      let storedCount = parseInt(data.record.count, 10);
+      if (isNaN(storedCount) || storedCount < 0) storedCount = 0;
+
+      if (storedDate !== todayKey){
+        // Cambió el día: reiniciamos el contador para todos
+        count = 0;
+        render(false);
+        await persist(0, false);
+      } else {
+        count = storedCount;
+        render(false);
+        setStatus(todayLabel);
+      }
+    } catch (err){
+      setStatus('Sin conexión con el contador — reintenta recargando la página', true);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function persist(newCount, showSavingMsg){
+    if (showSavingMsg) setStatus('Guardando…');
+    const res = await fetch(API_URL, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Master-Key': MASTER_KEY
+      },
+      body: JSON.stringify({ count: newCount, date: todayKey })
+    });
+    if (!res.ok) throw new Error('No se pudo guardar');
+  }
+
+  async function saveCount(newCount, pulse){
+    const previous = count;
+    count = newCount;
+    render(pulse);
+    setBusy(true);
+    setStatus('Guardando…');
+    try{
+      await persist(newCount, false);
+      setStatus(todayLabel);
+    } catch (err){
+      count = previous;
+      render(false);
+      setStatus('No se pudo guardar, intenta de nuevo', true);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  plusBtn.addEventListener('click', () => {
+    if (busy) return;
+    saveCount(count + 1, true);
+  });
+
+  minusBtn.addEventListener('click', () => {
+    if (busy || count <= 0) return;
+    saveCount(count - 1, false);
+  });
+
+  loadCount();
+</script>
+
+</body>
+</html>
